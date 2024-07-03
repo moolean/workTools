@@ -1,8 +1,16 @@
 README.md
 setup.py
 mytools/__init__.py
+mytools/aossclient.py
+mytools/apis.py
+mytools/basic.py
+mytools/boto3client.py
+mytools/checkdata.py
+mytools/image.py
+mytools/jsonl.py
 mytools.egg-info/PKG-INFO
 mytools.egg-info/SOURCES.txt
 mytools.egg-info/dependency_links.txt
 mytools.egg-info/not-zip-safe
+mytools.egg-info/requires.txt
 mytools.egg-info/top_level.txt

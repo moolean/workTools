@@ -7,4 +7,14 @@ setup(name='mytools',
       author_email='yaotiankuo@sensetime.com',
       license='MIT',
       packages=['mytools'],
-      zip_safe=False)
+      zip_safe=False,
+      install_requires=[
+        "opencv-python",
+        "pandas",
+        "numpy",
+        "easydict",
+        "json",
+
+        # 添加更多的依赖项
+    ],
+    )
