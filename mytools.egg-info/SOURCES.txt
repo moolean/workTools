@@ -8,6 +8,7 @@ mytools/boto3client.py
 mytools/checkdata.py
 mytools/image.py
 mytools/jsonl.py
+mytools/view.py
 mytools.egg-info/PKG-INFO
 mytools.egg-info/SOURCES.txt
 mytools.egg-info/dependency_links.txt

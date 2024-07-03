@@ -8,6 +8,15 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 
+def getprompt(promptfile):
+    '''
+    输入prompt文件地址，返回prompt列表
+    '''
+    prompts = []
+    with open(promptfile, 'r') as f:
+        for line in f:
+            prompts.append(line.strip())
+    return prompts
 
 def bytes_to_image(data):
     """
@@ -32,6 +41,14 @@ def bytes_to_image(data):
 
 _boto3_client = None
 def get_image(url):
+    """获取图片
+
+    Args:
+        url (str): 图片地址，本地或ceph均可
+
+    Returns:
+        Image.image: 图像
+    """    
     global _boto3_client
     if _boto3_client is None:
         _boto3_client = Boto3Client()

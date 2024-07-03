@@ -13,7 +13,6 @@ import asyncio
 import logging
 import zipfile
 import pickle
-
 import numpy as np
 
 def set_logging(log_file, name=None):
@@ -51,6 +50,15 @@ def read_lines(file):
     return outputs    
 
 def read_jsonl(file, client=None):
+    """读取jsonl文件
+
+    Args:
+        file (str): 文件path
+        client (_type_, optional): 如果在ceph上传入client以读取. Defaults to None.
+
+    Returns:
+        list: 每条为list中一项
+    """    
     if client is None or not file.startswith('s3://'):
         assert Path(file).is_file(), file
         dataset = open(file, buffering=int(32e6)).readlines()
@@ -80,6 +88,12 @@ def parse_jsonl_str(data):
     return outputs
 
 def write_jsonl(file, data):
+    """写入jsonl文件，list每个对应每行
+
+    Args:
+        file (str): 写入文件的地址
+        data (list): 写入内容
+    """    
     fp = open(file, 'w', encoding='utf-8', buffering=int(32e6))
     for d in data:
         fp.write(json.dumps(d, ensure_ascii=False) + '\n')
