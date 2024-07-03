@@ -1,0 +1,8 @@
+README.md
+setup.py
+mytools/__init__.py
+mytools.egg-info/PKG-INFO
+mytools.egg-info/SOURCES.txt
+mytools.egg-info/dependency_links.txt
+mytools.egg-info/not-zip-safe
+mytools.egg-info/top_level.txt
