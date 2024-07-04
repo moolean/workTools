@@ -13,8 +13,7 @@ setup(name='mytools',
         "pandas",
         "numpy",
         "easydict",
-        "json",
-
+        "nbformat",
         # 添加更多的依赖项
     ],
     )

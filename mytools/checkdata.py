@@ -109,6 +109,7 @@ def checkdata(meta_dataset):
 def checkfiles(filepath):
     '''
     传入数据汇总文件，检查所有数据是否正确，目前只支持图像数据
+    
     汇总文件格式：{
                 'annotation':text_file,
                 'root':image_path
