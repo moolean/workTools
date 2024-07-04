@@ -7,6 +7,15 @@ from .boto3client import Boto3Client
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import cv2
+from datetime import datetime
+
+def gettime():
+    """
+    获取时间戳str，YYYMMDD形式
+    """
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%Y%m%d")
+    return formatted_time
 
 def getprompt(promptfile):
     '''
