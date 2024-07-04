@@ -14,6 +14,7 @@ setup(name='mytools',
         "numpy",
         "easydict",
         "nbformat",
+        "dashscope",
         # 添加更多的依赖项
     ],
     )

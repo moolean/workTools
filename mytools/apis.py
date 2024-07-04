@@ -12,7 +12,6 @@ import imghdr
 import base64
 import io
 import httpx
-import jsonlines
 import os
 import time
 import random
@@ -135,7 +134,7 @@ def _random_get_proxy(file, idx):
     # print(len(proxys), idx%len(proxys))
     return proxys[idx%len(proxys)]
 
-def api_request_gpt4o_singleturn(api_keys: list,
+def api_request_gpt4o_singleturn(api_key: str,
                                 infos: dict,
                                 prompt,
                                 image_size=(1024, 1024),
@@ -146,7 +145,7 @@ def api_request_gpt4o_singleturn(api_keys: list,
     单次使用gpt api
 
     Args:
-        api_keys:key的列表
+        api_key: str key
         infos:传入数据格式：{"image": "",
                             "height": 0,
                             "width": 0,
@@ -194,7 +193,6 @@ def api_request_gpt4o_singleturn(api_keys: list,
             ]
         }
     '''
-    api_key = random.choice(api_keys)
     if proxy_file != None:
         proxy_url = _random_get_proxy(proxy_file, api_idx)
         # proxy_url = 'socks5://10.140.90.11:10200'
