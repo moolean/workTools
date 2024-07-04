@@ -1,0 +1,6 @@
+opencv-python
+pandas
+numpy
+easydict
+nbformat
+dashscope
