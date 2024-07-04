@@ -64,7 +64,7 @@ displayData(data, current_index)
     nb.cells.append(nbf.v4.new_code_cell(code2))
 
     # 保存 notebook 到文件
-    with open('view.ipynb', 'w') as f:
+    with open(f"view_{data_jsonl.split("/")[-1]}.ipynb", 'w') as f:
         nbf.write(nb, f)
 
     print("Notebook created successfully!")

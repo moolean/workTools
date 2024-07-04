@@ -108,12 +108,6 @@ class JsonlWriter:
         self.fp.flush()
 
 
-
-
-
-
-
-
 def retry_decorator(max_retries=1, delay=0, name=None, logger=None):
     if logger is None:
         class FakeLogger:
