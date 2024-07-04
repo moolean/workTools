@@ -1,5 +1,5 @@
 from setuptools import setup
-setup(name='mytools',
+setup(name='senseTool',
       version='0.1',
       description='work tools',
       url='https://github.com/moolean/workTools.git',
