@@ -1,12 +1,12 @@
 from setuptools import setup
-setup(name='senseTool',
+setup(name='sensetool',
       version='0.1',
       description='work tools',
       url='https://github.com/moolean/workTools.git',
       author='yao tiankuo',
       author_email='yaotiankuo@sensetime.com',
       license='MIT',
-      packages=['mytools'],
+      packages=['sensetool'],
       zip_safe=False,
       install_requires=[
         "opencv-python",
