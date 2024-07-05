@@ -18,9 +18,9 @@
                                 api_idx=40101) 单次过gpt
     api_request_qwen(local_file, question, key) 单次过qwen
 5. basic
-    get_image(url)
-    getprompt(promptfile)
-    print_divider(text)
+    get_image(url)  获取图片
+    getprompt(promptfile) 获取prompt
+    print_divider(text) 打印分隔
 '''
 
 from .checkdata import (
