@@ -1,5 +1,37 @@
 
 import nbformat as nbf
+from PIL import Image
+
+def resize(image, base_short_side=512):
+    # Get the current size of the image
+    width, height = image.size
+    if max(width, height) < base_short_side:
+        return image
+
+    # Determine the short side and calculate the scaling factor
+    if width < height:
+        scaling_factor = base_short_side / width
+        new_width = base_short_side
+        new_height = int(height * scaling_factor)
+    else:
+        scaling_factor = base_short_side / height
+        new_height = base_short_side
+        new_width = int(width * scaling_factor)
+
+    # Resize the image while keeping the aspect ratio
+    resized_image = image.resize((new_width, new_height))
+
+    return resized_image
+
+def displayPerData(jsondata):
+    print(jsondata)
+    print(jsondata["conversations"][0]["value"])
+    print(jsondata["conversations"][1]["value"])
+
+    image = Image.open(jsondata["fullimage"])
+    image = resize(image, 448)
+    return image
+
 
 def startView(data_jsonl="", images_root=""):
     '''
@@ -12,7 +44,7 @@ def startView(data_jsonl="", images_root=""):
     code1 = """
 import ipywidgets as widgets
 from IPython.display import display, clear_output
-from utils.datavisulize import displayPerData
+from sensetool.view import displayPerData
 
 def displayData(data_list, current_index):
     # 创建显示数据的输出区域
@@ -64,7 +96,7 @@ displayData(data, current_index)
     nb.cells.append(nbf.v4.new_code_cell(code2))
 
     # 保存 notebook 到文件
-    with open(f"view_{data_jsonl.split("/")[-1]}.ipynb", 'w') as f:
+    with open(f"view_{data_jsonl.split('/')[-1]}.ipynb", 'w') as f:
         nbf.write(nb, f)
 
     print("Notebook created successfully!")
