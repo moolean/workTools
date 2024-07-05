@@ -47,7 +47,6 @@ def bytes_to_image(data):
     image = Image.open(image_io)
     return image
 
-
 _boto3_client = None
 def get_image(url):
     """获取图片
@@ -180,4 +179,35 @@ def split_list_into_parts(lst, n):
     return result
 
 def randomID(k=8):
+    """生成随机ID
+
+    Args:
+        k (int, optional): 长度. Defaults to 8.
+
+    Returns:
+        str: str ID
+    """
     return ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=k))
+
+def print_divider(text, width=50, divider='='):
+    """
+    打印一整行分割线，包含居中对齐的文本，每次打印的文本都具有相同的长度。
+
+    参数：
+    text: 要打印的文本
+    width: 整行的宽度，包含分割符号和文本
+    divider: 用于分割的符号
+    """
+    text_length = len(text)
+    if text_length > width - 2:
+        raise ValueError("Text is too long for the specified width")
+    
+    # 计算左右分隔符的长度
+    total_divider_length = width - text_length - 2
+    left_divider_length = total_divider_length // 2
+    right_divider_length = total_divider_length - left_divider_length
+    
+    # 构建分割行
+    divider_line = f"{divider * left_divider_length} {text} {divider * right_divider_length}"
+    
+    print(divider_line)

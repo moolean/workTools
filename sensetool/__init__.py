@@ -20,6 +20,7 @@
 5. basic
     get_image(url)
     getprompt(promptfile)
+    print_divider(text)
 '''
 
 from .checkdata import (
@@ -46,7 +47,8 @@ from .apis import(
 from .basic import (
     get_image,
     get_file,
-    getprompt
+    getprompt,
+    print_divider
 )
 def start():
     print("import successful")
