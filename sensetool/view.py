@@ -1,4 +1,5 @@
 
+import os
 import nbformat as nbf
 from PIL import Image
 
@@ -23,12 +24,12 @@ def resize(image, base_short_side=512):
 
     return resized_image
 
-def displayPerData(jsondata):
+def displayPerData(jsondata, images_root):
     print(jsondata)
     print(jsondata["conversations"][0]["value"])
     print(jsondata["conversations"][1]["value"])
 
-    image = Image.open(jsondata["fullimage"])
+    image = Image.open(os.path.join(images_root, jsondata["image"]))
     image = resize(image, 448)
     return image
 
@@ -61,7 +62,7 @@ def displayData(data_list, current_index):
     with output:
         clear_output(wait=True)
         print(current_index)
-        img = displayPerData(data_list[current_index])
+        img = displayPerData(data_list[current_index], images_root)
         display(img)
         
     # 定义按钮点击事件处理函数
@@ -76,7 +77,7 @@ def displayData(data_list, current_index):
         with output:
             clear_output(wait=True)
             print(current_index)
-            img = displayPerData(data_list[current_index])
+            img = displayPerData(data_list[current_index], )
             display(img)
     
     # 绑定按钮的点击事件
@@ -84,7 +85,7 @@ def displayData(data_list, current_index):
     button_next.on_click(on_button_clicked)
     """
     code2 = f"""
-from mytools import read_jsonl
+from sensetool import read_jsonl
 dataroot = "{images_root}"
 data_jsonl = "{data_jsonl}"
 data = read_jsonl(data_jsonl)
@@ -96,7 +97,7 @@ displayData(data, current_index)
     nb.cells.append(nbf.v4.new_code_cell(code2))
 
     # 保存 notebook 到文件
-    with open(f"view_{data_jsonl.split('/')[-1]}.ipynb", 'w') as f:
+    with open(f"view_{data_jsonl.split('/')[-1].split(".")[0]}.ipynb", 'w') as f:
         nbf.write(nb, f)
 
     print("Notebook created successfully!")
