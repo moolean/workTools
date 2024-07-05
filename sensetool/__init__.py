@@ -21,16 +21,18 @@
     get_image(url)  获取图片
     getprompt(promptfile) 获取prompt
     print_divider(text) 打印分隔
+6. time
+    time.timer_decorator(func) 函数时间计算装饰器 
 '''
 
 from .checkdata import (
     checkfiles
 )
+
 from .jsonl import (
     read_jsonl,
     write_jsonl,
 )
-
 
 from .view import (
     startView
@@ -44,11 +46,13 @@ from .apis import(
     api_request_qwen,
 
 )
+
 from .basic import (
     get_image,
     get_file,
     getprompt,
     print_divider
 )
+
 def start():
     print("import successful")
