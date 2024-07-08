@@ -77,7 +77,7 @@ def displayData(data_list, current_index, images_root):
         with output:
             clear_output(wait=True)
             print(current_index)
-            img = displayPerData(data_list[current_index], )
+            img = displayPerData(data_list[current_index], images_root)
             display(img)
     
     # 绑定按钮的点击事件
