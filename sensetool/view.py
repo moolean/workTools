@@ -47,7 +47,7 @@ import ipywidgets as widgets
 from IPython.display import display, clear_output
 from sensetool.view import displayPerData
 
-def displayData(data_list, current_index):
+def displayData(data_list, current_index, images_root):
     # 创建显示数据的输出区域
     output = widgets.Output()
     
@@ -90,14 +90,14 @@ dataroot = "{images_root}"
 data_jsonl = "{data_jsonl}"
 data = read_jsonl(data_jsonl)
 current_index = 0  # 当前数据索引
-displayData(data, current_index)
+displayData(data, current_index, dataroot)
     """
 
     nb.cells.append(nbf.v4.new_code_cell(code1))
     nb.cells.append(nbf.v4.new_code_cell(code2))
 
     # 保存 notebook 到文件
-    with open(f"view_{data_jsonl.split('/')[-1].split(".")[0]}.ipynb", 'w') as f:
+    with open(f"view_{data_jsonl.split('/')[-1].split('.')[0]}.ipynb", 'w') as f:
         nbf.write(nb, f)
 
     print("Notebook created successfully!")
