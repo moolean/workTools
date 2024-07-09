@@ -124,13 +124,12 @@ def read_gpt_keys(key_file):
             outputs.append(k)
     return outputs
 
-def _random_get_proxy(file, idx):
-    fr = open(file, 'r', encoding='utf-8')
-    data = json.load(fr)
+def _random_get_proxy(proxy_dict, idx):
+    
+    data = proxy_dict
     proxys = []
     for key, value in data.items():
         proxys += value
-    fr.close()
     # print(len(proxys), idx%len(proxys))
     return proxys[idx%len(proxys)]
 
@@ -139,8 +138,8 @@ def api_request_gpt4o_singleturn(api_key: str,
                                 prompt,
                                 image_size=(1024, 1024),
                                 detail='high',
-                                proxy_file='socks_240318_ids_5_r280.json',
-                                api_idx=40101):
+                                proxy_dict=None,
+                                api_idx=None):
     '''
     单次使用gpt api
 
@@ -154,7 +153,7 @@ def api_request_gpt4o_singleturn(api_key: str,
         prompt:gpt prompt，prompt中被替换的文字用<<<text>>>表示
         image_size:(int,int) 规定gpt输入图的大小 ** 如不传入图片使用None **
         detail:gpt输入分辨率
-        proxy_file:代理文件, ** M集群不用代理，使用None **
+        proxy_dict:代理文件读出的dict, ** M集群不用代理，使用None **
         api_idx:代理文件中id，指定使用的代理
 
     Returns:
@@ -193,8 +192,8 @@ def api_request_gpt4o_singleturn(api_key: str,
             ]
         }
     '''
-    if proxy_file != None:
-        proxy_url = _random_get_proxy(proxy_file, api_idx)
+    if proxy_dict != None:
+        proxy_url = _random_get_proxy(proxy_dict, api_idx)
         # proxy_url = 'socks5://10.140.90.11:10200'
         proxies = {
         "http://": f"{proxy_url}",
@@ -248,14 +247,14 @@ def api_request_gpt4o_singleturn(api_key: str,
 
 
 
-def api_request_qwen(local_file, question, key):
+def api_request_qwen(local_file, question, key, model="qwen-vl-plus"):
     """使用qwen
 
     Args:
         local_file (_type_): 图片文件地址
         question (_type_): 问题
         key (_type_): api-key
-
+        model(str): 模型名字
     Returns:
         str: 模型返回结果
     """
@@ -264,12 +263,8 @@ def api_request_qwen(local_file, question, key):
        linux&mac file schema: file:///home/images/test.png
        windows file schema: file://D:/images/abc.png
     """
-    # "sk-fbb72a7e84514934818827ba66e75c8f"
-    # "sk-011fa90bdb124692a4272426dcd5411c" 
-    dashscope.api_key = key  # chunhua
-    # dashscope.api_key="sk-4109b467ca444056b9ddf350cd6e39f6"
-    # dashscope.api_key = "sk-91e6e3408c5c45abade8ebd61995b430"
-    # local_file_path = 'file://The_local_absolute_file_path'
+
+    dashscope.api_key = key 
     local_file_path = f'file://{local_file}'
     messages = [{
         'role': 'system',
@@ -288,7 +283,7 @@ def api_request_qwen(local_file, question, key):
             },
         ]
     }]
-    response = MultiModalConversation.call(model='qwen-vl-plus', messages=messages)
+    response = MultiModalConversation.call(model=model, messages=messages)
     if response.status_code == 200:
         try:
             result_content = response.output.choices[0].message.content[0]['text']

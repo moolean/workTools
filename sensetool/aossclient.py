@@ -15,13 +15,8 @@ def get_client(*args, boto3=False, **kwargs):
         return AossClient(*args, **kwargs)
 
 class AossClient:
-    def __init__(self, endpoint_url=None, access_key=None, secret_key=None):
-        if endpoint_url is None:
-            endpoint_url = 'http://aoss-internal.ms-sc-01.maoshanwangtechapi-oss.com/'
-        if access_key is None:
-            access_key = 'CB7A484694494A748C22282351B3E05C'
-        if secret_key is None:
-            secret_key = 'C1B454B615104F4FB2F9436CD3667B70'
+    def __init__(self, endpoint_url, access_key, secret_key):
+
         self.endpoint_url = endpoint_url
         self.access_key = access_key
         self.secret_key = secret_key

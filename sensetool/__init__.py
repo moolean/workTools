@@ -1,32 +1,39 @@
 '''
 工具包
-1. checkfiles(filepath) 传入数据汇总文件，检查数据正确性
+1. 检查数据
+    - c = checker(client)
+    - c.checkfiles(filepath) 传入数据汇总文件，检查数据正确性
 2. startView() 带图数据浏览，创建ipynb文件
-3. jsonl:
-    read_jsonl(filepath) 
-    write_jsonl(file, data)
-4. apis: 
-    api_request_internl_singleturn(name, question, image, url) 单轮internl
-    internlAPI_singalturn(data, url, optfilepath, num_worker=25) 批量过internl
-    read_gpt_keys(key_file) 读取gpt key
-    api_request_gpt4o_singleturn(api_keys: list,
+3. ceph
+    - Boto3Client(endpoint_url, access_key, secret_key) ceph的client，获取ceph数据前需启动client
+    - AossClient(endpoint_url, access_key, secret_key)
+4. jsonl:
+    - read_jsonl(file, client=None) 
+    - write_jsonl(file, data)
+5. apis: 
+    - 单轮internl: api_request_internl_singleturn(name, question, image, url) 
+    - 批量过internl: internlAPI_singalturn(data, url, optfilepath, num_worker=25) 
+    - 读取gpt key: read_gpt_keys(key_file) 
+    - 单次过gpt: api_request_gpt4o_singleturn(api_keys: list,
                                 infos: dict,
                                 prompt,
                                 image_size=(1024, 1024),
                                 detail='high',
-                                proxy_file='socks_240318_ids_5_r280.json',
-                                api_idx=40101) 单次过gpt
-    api_request_qwen(local_file, question, key) 单次过qwen
-5. basic
-    get_image(url)  获取图片
-    getprompt(promptfile) 获取prompt
-    print_divider(text) 打印分隔
-6. time
-    time.timer_decorator(func) 函数时间计算装饰器 
+                                proxy_dict=None,
+                                api_idx=None) 
+    - 单次过qwen: api_request_qwen(local_file, question, key, model) 
+
+6. basic
+    - 获取图片: get_image(url, boto3_client = None) 
+    - 获取文件: get_file(url, boto3_client = None) 
+    - 获取prompt: getprompt(promptfile) 
+    - 打印分隔: print_divider(text) 
+7. time
+    - time.timer_decorator(func) 函数时间计算装饰器 
 '''
 
 from .checkdata import (
-    checkfiles
+    checker
 )
 
 from .jsonl import (
@@ -53,6 +60,8 @@ from .basic import (
     getprompt,
     print_divider
 )
+from .boto3client import Boto3Client
+from .aossclient import AossClient
 
 def start():
     print("import successful")
