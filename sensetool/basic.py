@@ -3,7 +3,6 @@ import io
 import random
 import string
 import numpy as np
-from .boto3client import Boto3Client
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import cv2
@@ -47,19 +46,17 @@ def bytes_to_image(data):
     image = Image.open(image_io)
     return image
 
-_boto3_client = None
-def get_image(url):
+
+def get_image(url, boto3_client = None):
     """获取图片
 
     Args:
         url (str): 图片地址，本地或ceph均可
+        boto3_client (Boto3Client): 传入ceph client，默认为None
 
     Returns:
         Image.image: 图像
     """    
-    global _boto3_client
-    if _boto3_client is None:
-        _boto3_client = Boto3Client()
         
     if isinstance(url, Path):
         url = str(url)
@@ -69,16 +66,22 @@ def get_image(url):
         with open(url, 'rb') as fp:
             image_bytes = fp.read()
     else:
-        image_bytes = _boto3_client.get(url)
+        image_bytes = boto3_client.get(url)
     assert image_bytes is not None, f'image is None, image={url}'
     image = bytes_to_image(image_bytes)
     return image
 
-def get_file(url):
-    global _boto3_client
-    if _boto3_client is None:
-        _boto3_client = Boto3Client()
-        
+def get_file(url, boto3_client=None):
+    """获取文件
+
+    Args:
+        url (str): 文件地址，本地或ceph均可
+        boto3_client (Boto3Client): 传入ceph client，默认为None
+
+    Returns:
+        file_bytes: 文件
+    """    
+
     if isinstance(url, Path):
         url = str(url)
     
@@ -87,7 +90,7 @@ def get_file(url):
         with open(url, 'rb') as fp:
             file_bytes = fp.read()
     else:
-        file_bytes = _boto3_client.get(url)
+        file_bytes = boto3_client.get(url)
     assert file_bytes is not None, f'file_bytes is None, url={url}'
     return file_bytes
 
