@@ -30,8 +30,18 @@ import json
 
 
 def _encode_image_to_base64(image_path):
-    with open(image_path, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+    # 打开图像并转换为 RGB 模式
+    with Image.open(image_path) as img:
+        img = img.convert('RGB')
+        
+        # 创建一个字节流对象来保存图像数据
+        buffered = io.BytesIO()
+        img.save(buffered, format="JPEG")  # 将图像保存为 JPEG 格式到字节流中
+        
+        # 读取字节流的内容并编码为 base64
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        
+        return img_str
     
 def api_request_internl_singleturn(name, question, image, url,
     param =  {
