@@ -16,9 +16,11 @@ def gettime():
     formatted_time = current_time.strftime("%Y%m%d")
     return formatted_time
 
-def getprompt(promptfile):
+def gettxt_list(promptfile):
     '''
-    输入prompt文件地址，返回prompt列表
+    所有可以分行读取的文件均可，返回每行内容的列表，无换行符
+    
+    （输入prompt文件地址，返回prompt列表）
     '''
     prompts = []
     with open(promptfile, 'r') as f:
