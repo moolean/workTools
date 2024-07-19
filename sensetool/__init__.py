@@ -26,7 +26,7 @@
 6. basic
     - 获取图片: get_image(url, boto3_client = None) 
     - 获取文件: get_file(url, boto3_client = None) 
-    - 获取prompt: getprompt(promptfile) 
+    - 获取文件内容无换行符: gettxt_list(promptfile) 
     - 打印分隔: print_divider(text) 
 7. time
     - time.timer_decorator(func) 函数时间计算装饰器 
@@ -57,7 +57,7 @@ from .apis import(
 from .basic import (
     get_image,
     get_file,
-    getprompt,
+    gettxt_list,
     print_divider
 )
 from .boto3client import Boto3Client
