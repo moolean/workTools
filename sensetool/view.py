@@ -28,7 +28,10 @@ def displayPerData(jsondata, images_root):
     print(jsondata)
     print(jsondata["conversations"][0]["value"])
     print(jsondata["conversations"][1]["value"])
-
+    try:# 支持显示dpo数据
+        print(jsondata["reject"])
+    except:
+        pass
     image = Image.open(os.path.join(images_root, jsondata["image"]))
     image = resize(image, 448)
     return image
