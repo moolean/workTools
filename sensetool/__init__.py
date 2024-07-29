@@ -5,8 +5,9 @@
     - c.checkfiles(filepath) 传入数据汇总文件，检查数据正确性
 2. startView() 带图数据浏览，创建ipynb文件
 3. ceph
-    - Boto3Client(endpoint_url, access_key, secret_key) ceph的client，获取ceph数据前需启动client
-    - AossClient(endpoint_url, access_key, secret_key)
+    默认使用～/.aoss.conf中的配置，如果没有可以手动输入三个值
+    - Boto3Client(endpoint_url=None, access_key=None, secret_key=None) ceph的client，获取ceph数据前需启动client
+    - AossClient(endpoint_url=None, access_key=None, secret_key=None)
 4. jsonl:
     - read_jsonl(file, client=None) 
     - write_jsonl(file, data)
