@@ -1,4 +1,6 @@
+import configparser
 import io
+import os
 import boto3
 from botocore.exceptions import NoCredentialsError
 from botocore.exceptions import ClientError
@@ -7,6 +9,7 @@ try:
     from aoss_client.client import Client
 except:
     pass
+from .basic import print_divider
 
 def get_client(*args, boto3=False, **kwargs):
     if not boto3:
@@ -15,15 +18,41 @@ def get_client(*args, boto3=False, **kwargs):
         return AossClient(*args, **kwargs)
 
 class AossClient:
-    def __init__(self, endpoint_url, access_key, secret_key):
+    def __init__(self, endpoint_url=None, access_key=None, secret_key=None):
 
-        self.endpoint_url = endpoint_url
-        self.access_key = access_key
-        self.secret_key = secret_key
+        if endpoint_url and access_key and secret_key:
+            self.endpoint_url = endpoint_url
+            self.access_key = access_key
+            self.secret_key = secret_key
+        else:
+            # 固定的路径前缀
+            fixed_part = "/user/"
+            # 获取当前工作目录的路径
+            current_directory = os.getcwd()
+            # 查找固定部分在当前路径中的位置
+            fixed_part_index = current_directory.find(fixed_part)
+            if fixed_part_index != -1:
+                # 提取固定部分之前的所有内容
+                path_before_fixed_part = current_directory[:fixed_part_index]
+                # 提取用户名部分（固定部分之后的第一段路径）
+                remaining_path = current_directory[fixed_part_index + len(fixed_part):]
+                username = remaining_path.split(os.sep)[0]
+                # 构建用户根目录的完整路径
+                user_root = os.path.join(path_before_fixed_part, fixed_part.strip(os.sep), username)
+            else:
+                user_root = None
 
-        self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
-        self.s3_client = self.session.client('s3', endpoint_url=endpoint_url)
-    
+            config = configparser.ConfigParser()
+            config.read(os.path.join(user_root,'.aoss.conf'))
+
+            self.endpoint_url = config['sensetool']['host_base']
+            self.access_key = config['sensetool']['access_key']
+            self.secret_key = config['sensetool']['secret_key']
+
+        self.session = boto3.session.Session(aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
+        self.s3_client = self.session.client('s3', endpoint_url=self.endpoint_url)
+        print_divider("初始化client成功")
+
     def _parse_url(self, file_path):
         assert file_path.startswith('s3://')
         parsed_url = urlparse(file_path)

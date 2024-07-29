@@ -48,6 +48,25 @@ def bytes_to_image(data):
     image = Image.open(image_io)
     return image
 
+# def get_aoss_file(self, file_path):
+#     assert file_path.startswith('s3://')
+#     parsed_url = urlparse(file_path)
+#     bucket = parsed_url.netloc
+#     prefix = parsed_url.path.lstrip("/")
+
+#     try:
+#         # Fetch the file from S3
+#         # print(f'bucket={bucket}, prefix={prefix}')
+#         response = self.s3_client.get_object(Bucket=bucket, Key=prefix)
+        
+#         # Read the content of the file
+#         file_content = response['Body'].read()
+#         return file_content
+
+#     except NoCredentialsError:
+#         print("Credentials are not available")
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
 
 def get_image(url, boto3_client = None):
     """获取图片
@@ -68,6 +87,7 @@ def get_image(url, boto3_client = None):
         with open(url, 'rb') as fp:
             image_bytes = fp.read()
     else:
+        # from aoss_client.client import Client
         image_bytes = boto3_client.get(url)
     assert image_bytes is not None, f'image is None, image={url}'
     image = bytes_to_image(image_bytes)
