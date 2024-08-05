@@ -15,7 +15,9 @@ setup(name='sensetool',
         "easydict",
         "nbformat",
         "dashscope",
-        "ipywidgets"
+        "ipywidgets",
+        "openai",
+        "boto3"
         # 添加更多的依赖项
     ],
     )
