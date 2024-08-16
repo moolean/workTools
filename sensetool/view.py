@@ -26,8 +26,9 @@ def resize(image, base_short_side=512):
 
 def displayPerData(jsondata, images_root):
     print(jsondata)
-    print(jsondata["conversations"][0]["value"])
-    print(jsondata["conversations"][1]["value"])
+    for i in jsondata["conversations"]:
+        print(i["value"])
+        print("\n")
     try:# 支持显示dpo数据
         print(jsondata["reject"])
     except:
