@@ -25,23 +25,10 @@ class AossClient:
             self.access_key = access_key
             self.secret_key = secret_key
         else:
-            # 固定的路径前缀
-            fixed_part = "/user/"
-            # 获取当前工作目录的路径
-            current_directory = os.getcwd()
-            # 查找固定部分在当前路径中的位置
-            fixed_part_index = current_directory.find(fixed_part)
-            if fixed_part_index != -1:
-                # 提取固定部分之前的所有内容
-                path_before_fixed_part = current_directory[:fixed_part_index]
-                # 提取用户名部分（固定部分之后的第一段路径）
-                remaining_path = current_directory[fixed_part_index + len(fixed_part):]
-                username = remaining_path.split(os.sep)[0]
-                # 构建用户根目录的完整路径
-                user_root = os.path.join(path_before_fixed_part, fixed_part.strip(os.sep), username)
-            else:
-                user_root = None
-
+            # 获取跟目录路径，统一跟目录为 /mnt/afs/yaotiankuo
+            current_directory = os.getcwd().split("/") # ['', 'mnt', 'afs', 'yaotiankuo']
+            user_root = "/".join(current_directory[:4])
+            # 获取aoss文件，默认aoss.conf在用户跟目录下
             config = configparser.ConfigParser()
             config.read(os.path.join(user_root,'.aoss.conf'))
 
