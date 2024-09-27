@@ -30,7 +30,7 @@ class AossClient:
             user_root = "/".join(current_directory[:4])
             # 获取aoss文件，默认aoss.conf在用户跟目录下
             config = configparser.ConfigParser()
-            config.read(os.path.join(user_root,'.aoss.conf'))
+            config.read(os.path.join(user_root,'aoss.conf'))
 
             self.endpoint_url = config['sensetool']['host_base']
             self.access_key = config['sensetool']['access_key']

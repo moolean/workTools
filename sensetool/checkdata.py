@@ -22,7 +22,7 @@ class checker():
         """
         self._AossClient = client
 
-    def check_format(self, dataset):
+    def _check_format(self, dataset):
         for index, data in enumerate(dataset):
             # if 'image' in data and data['image'] is not None:
             #     if 'width' not in data or 'height' not in data:
@@ -51,7 +51,7 @@ class checker():
                     if not (message['from'] == 'gpt'):
                         return f"index={index}, Not from gpt: {data}: {index}"
 
-    def check_image_correct(self, dataset, image_root):
+    def _check_image_correct(self, dataset, image_root):
         cnt_fail = 0
         cnt_success = 0
         ret = True
@@ -82,12 +82,12 @@ class checker():
             # print(f'>>> input={json_file}')
             dataset = read_jsonl(json_file, self._AossClient)
             # print(f'number={len(dataset)}')
-            msg = self.check_format(dataset)
+            msg = self._check_format(dataset)
             # msg = None
             if msg is None:
                 # return "sesecore cannot access mst images, other format correct"
                 mini_dataset = random.choices(dataset, k=100)
-                if self.check_image_correct(mini_dataset, image_root):
+                if self._check_image_correct(mini_dataset, image_root):
                     msg = 'check image success.'
                     return msg
                 else:
@@ -100,7 +100,7 @@ class checker():
             print(traceback.format_exc())
             return "Error: unexpected error"
 
-    def checkdata(self, meta_dataset):
+    def _checkdata(self, meta_dataset):
         with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
             for meta, msg in zip(meta_dataset, executor.map(self.worker_fn, meta_dataset)):
                 print('\n>>>>>>')
@@ -125,6 +125,12 @@ class checker():
                     'annotation':text_file,
                     'root':image_path
                     },...]
+        也可传入metadata_dict:{
+        "data_name":{
+                    'annotation':text_file,
+                    'root':image_path
+                    },...
+        }            
         '''
         input_list = []
         if isinstance(filepath, str) and os.path.exists(filepath):
@@ -135,11 +141,17 @@ class checker():
                     'image_path': meta['root']
                 })
         elif isinstance(filepath, dict):
-
-            input_list.append({
-                'text_file': filepath['annotation'],
-                'image_path': filepath['root']
-            })
+            if "annotation" in filepath.keys():
+                input_list.append({
+                    'text_file': filepath['annotation'],
+                    'image_path': filepath['root']
+                })
+            else:
+                for k, v in filepath:
+                    input_list.append({
+                        'text_file': v['annotation'],
+                        'image_path': v['root']
+                    })
         elif isinstance(filepath, list):
             for meta in filepath:
                 input_list.append({
@@ -148,4 +160,4 @@ class checker():
                 })
         
         print(f"检查{len(input_list)}个数据集")
-        self.checkdata(input_list)
+        self._checkdata(input_list)
