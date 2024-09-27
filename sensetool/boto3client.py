@@ -10,7 +10,7 @@ import configparser
 class Boto3Client:
     def __init__(self, endpoint_url=None, access_key=None, secret_key=None):
         """
-        初始化ceph服务，不输入key则默认使用~/.aoss.cnf
+        初始化ceph服务，不输入key则默认使用~/aoss.cnf
         """
 
         if endpoint_url and access_key and secret_key:
@@ -36,7 +36,7 @@ class Boto3Client:
                 user_root = None
 
             config = configparser.ConfigParser()
-            config.read(os.path.join(user_root,'.aoss.conf'))
+            config.read(os.path.join(user_root,'aoss.conf'))
 
             self.endpoint_url = config['sensetool']['host_base']
             self.access_key = config['sensetool']['access_key']
