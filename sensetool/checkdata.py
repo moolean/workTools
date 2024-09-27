@@ -11,6 +11,85 @@ from easydict import EasyDict as edict
 from .basic import get_image
 from .jsonl import read_jsonl
 
+def check_format(dataset):
+    for index, data in enumerate(dataset):
+        # if 'image' in data and data['image'] is not None:
+        #     if 'width' not in data or 'height' not in data:
+        #         return f"index={index}, no width or height"
+        #     if not (isinstance(data['width'], int) and data['width'] > 0):
+        #         return f'index={index}, data["width"] = ({type(data["width"])}) {data["width"]}'
+        #     if not (isinstance(data['height'], int) and data['height'] > 0):
+        #         return f'index={index}, data["height"] = ({type(data["height"])}) {data["height"]}'
+        if len(data['conversations']) < 2 or len(data['conversations']) % 2 != 0:
+            return f"index={index}, Not correct number: {index}"
+        for i, message in enumerate(data['conversations']):
+            if i == 0:
+                if not message['value'].startswith('<image>\n'):
+                    return f"index={index}, No <image> tag: {index}, {message['value']}"
+            if i > 0:
+                if '<image>' in message['value']:
+                    return f"index={index}, extra <image> tag: {index}"
+            if not isinstance(message['value'], str):
+                return f"index={index}, Not correct format: it should be a string: {index}"
+            if not (len(message['value']) > 0):
+                return f"index={index}, No Message: {data}: {index}"
+            if i % 2 == 0:
+                if not (message['from'] == 'human'):
+                    return f"index={index}, Not from human: {data}: {index}"
+            else:
+                if not (message['from'] == 'gpt'):
+                    return f"index={index}, Not from gpt: {data}: {index}"
+
+def check_image_correct(dataset, image_root, client):
+    cnt_fail = 0
+    cnt_success = 0
+    ret = True
+    for data in dataset:
+        if 'image' not in data:
+            continue
+        image_name = data['image']
+        image_file = os.path.join(image_root, image_name)
+        try:
+            image = get_image(image_file, client)
+            cnt_success += 1
+        except:
+            cnt_fail += 1
+            print(f"image={image_name}, get fail, image_url={image_file}")
+            ret = ret and False
+        # width, height = image.size
+        # if width != data['width'] or height != data['height']:
+        #     print(f"image={image_name}, wrong image size, image_url={image_file}")
+        #     ret = ret and False
+    # print(f'image path check, cnt_success={cnt_success}, cnt_fail={cnt_fail}')
+    return ret
+
+def worker_fn(meta):
+    # meta, client = args
+    try:
+        json_file = meta['text_file']
+        image_root = meta['image_path']
+        # print(f'>>> input={json_file}')
+        dataset = read_jsonl(json_file, AossClient)
+        # print(f'number={len(dataset)}')
+        msg = check_format(dataset)
+        # msg = None
+        if msg is None:
+            # return "sesecore cannot access mst images, other format correct"
+            mini_dataset = random.choices(dataset, k=100)
+            if check_image_correct(mini_dataset, image_root, AossClient):
+                msg = 'check image success.'
+                return msg
+            else:
+                msg = 'Error: image check fail'
+                return msg
+        else:
+            msg = f'Error: format is incorrect. msg={msg}'
+            return msg
+    except:
+        print(traceback.format_exc())
+        return "Error: unexpected error"
+
+
 class checker():
     """数据检查
     """
@@ -20,93 +99,16 @@ class checker():
         Args:
             client (aossclient): ceph客户端
         """
-        self._AossClient = client
-
-    def _check_format(self, dataset):
-        for index, data in enumerate(dataset):
-            # if 'image' in data and data['image'] is not None:
-            #     if 'width' not in data or 'height' not in data:
-            #         return f"index={index}, no width or height"
-            #     if not (isinstance(data['width'], int) and data['width'] > 0):
-            #         return f'index={index}, data["width"] = ({type(data["width"])}) {data["width"]}'
-            #     if not (isinstance(data['height'], int) and data['height'] > 0):
-            #         return f'index={index}, data["height"] = ({type(data["height"])}) {data["height"]}'
-            if len(data['conversations']) < 2 or len(data['conversations']) % 2 != 0:
-                return f"index={index}, Not correct number: {index}"
-            for i, message in enumerate(data['conversations']):
-                if i == 0:
-                    if not message['value'].startswith('<image>\n'):
-                        return f"index={index}, No <image> tag: {index}, {message['value']}"
-                if i > 0:
-                    if '<image>' in message['value']:
-                        return f"index={index}, extra <image> tag: {index}"
-                if not isinstance(message['value'], str):
-                    return f"index={index}, Not correct format: it should be a string: {index}"
-                if not (len(message['value']) > 0):
-                    return f"index={index}, No Message: {data}: {index}"
-                if i % 2 == 0:
-                    if not (message['from'] == 'human'):
-                        return f"index={index}, Not from human: {data}: {index}"
-                else:
-                    if not (message['from'] == 'gpt'):
-                        return f"index={index}, Not from gpt: {data}: {index}"
-
-    def _check_image_correct(self, dataset, image_root):
-        cnt_fail = 0
-        cnt_success = 0
-        ret = True
-        for data in dataset:
-            if 'image' not in data:
-                continue
-            image_name = data['image']
-            image_file = os.path.join(image_root, image_name)
-            try:
-                image = get_image(image_file, self._AossClient)
-                cnt_success += 1
-            except:
-                cnt_fail += 1
-                print(f"image={image_name}, get fail, image_url={image_file}")
-                ret = ret and False
-            # width, height = image.size
-            # if width != data['width'] or height != data['height']:
-            #     print(f"image={image_name}, wrong image size, image_url={image_file}")
-            #     ret = ret and False
-        # print(f'image path check, cnt_success={cnt_success}, cnt_fail={cnt_fail}')
-        return ret
-
-
-    def worker_fn(self, meta):
-        try:
-            json_file = meta['text_file']
-            image_root = meta['image_path']
-            # print(f'>>> input={json_file}')
-            dataset = read_jsonl(json_file, self._AossClient)
-            # print(f'number={len(dataset)}')
-            msg = self._check_format(dataset)
-            # msg = None
-            if msg is None:
-                # return "sesecore cannot access mst images, other format correct"
-                mini_dataset = random.choices(dataset, k=100)
-                if self._check_image_correct(mini_dataset, image_root):
-                    msg = 'check image success.'
-                    return msg
-                else:
-                    msg = 'Error: image check fail'
-                    return msg
-            else:
-                msg = f'Error: format is incorrect. msg={msg}'
-                return msg
-        except:
-            print(traceback.format_exc())
-            return "Error: unexpected error"
+        global AossClient 
+        AossClient = client
 
     def _checkdata(self, meta_dataset):
-        with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
-            for meta, msg in zip(meta_dataset, executor.map(self.worker_fn, meta_dataset)):
+        # args = [(meta, lambda x:self._AossClient) for meta in meta_dataset]
+        with concurrent.futures.ProcessPoolExecutor(max_workers=len(meta_dataset)) as executor:
+            for meta, msg in zip(meta_dataset, executor.map(worker_fn, meta_dataset)):
                 print('\n>>>>>>')
                 print(meta)
                 print(msg)
-
 
     # 数据脚本验证
     def checkfiles(self, filepath):
@@ -131,6 +133,8 @@ class checker():
                     'root':image_path
                     },...
         }            
+        或者直接传入metadata_dict的文件地址
+
         '''
         input_list = []
         if isinstance(filepath, str) and os.path.exists(filepath):
