@@ -147,7 +147,7 @@ class checker():
                     'image_path': filepath['root']
                 })
             else:
-                for k, v in filepath:
+                for k, v in filepath.items():
                     input_list.append({
                         'text_file': v['annotation'],
                         'image_path': v['root']
