@@ -5,17 +5,17 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 from botocore.exceptions import ClientError
 from urllib.parse import urlparse
-try:
-    from aoss_client.client import Client
-except:
-    pass
+# try:
+#     from aoss_client.client import Client
+# except:
+#     pass
 from .basic import print_divider
 
-def get_client(*args, boto3=False, **kwargs):
-    if not boto3:
-        return Client(*args, **kwargs)
-    else:
-        return AossClient(*args, **kwargs)
+# def get_client(*args, boto3=False, **kwargs):
+#     if not boto3:
+#         return Client(*args, **kwargs)
+#     else:
+#         return AossClient(*args, **kwargs)
 
 class AossClient:
     def __init__(self, endpoint_url=None, access_key=None, secret_key=None):

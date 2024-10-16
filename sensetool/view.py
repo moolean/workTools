@@ -24,7 +24,7 @@ def resize(image, base_short_side=512):
 
     return resized_image
 
-def displayPerData(jsondata, images_root):
+def displayPerData(jsondata, images_root, resize_size=448):
     print(jsondata)
     for i in jsondata["conversations"]:
         print(i["value"])
@@ -34,7 +34,7 @@ def displayPerData(jsondata, images_root):
     except:
         pass
     image = Image.open(os.path.join(images_root, jsondata["image"]))
-    image = resize(image, 448)
+    image = resize(image, resize_size)
     return image
 
 
