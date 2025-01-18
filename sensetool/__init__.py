@@ -5,6 +5,7 @@
     - c.checkfiles(filepath) 传入数据汇总文件，检查数据正确性
 2. startView() 带图数据浏览，创建ipynb文件
 3. ceph
+    client = sensetool.AossClient()
     默认使用～/.aoss.conf中的配置，如果没有可以手动输入三个值
     - Boto3Client(endpoint_url=None, access_key=None, secret_key=None) ceph的client，获取ceph数据前需启动client
     - AossClient(endpoint_url=None, access_key=None, secret_key=None)
@@ -12,17 +13,7 @@
     - read_jsonl(file, client=None) 
     - write_jsonl(file, data)
 5. apis: 
-    - 单轮internl: api_request_internl_singleturn(name, question, image, url) 
-    - 批量过internl: internlAPI_singalturn(data, url, optfilepath, num_worker=25) 
-    - 读取gpt key: read_gpt_keys(key_file) 
-    - 单次过gpt: api_request_gpt4o_singleturn(api_keys: list,
-                                infos: dict,
-                                prompt,
-                                image_size=(1024, 1024),
-                                detail='high',
-                                proxy_dict=None,
-                                api_idx=None) 
-    - 单次过qwen: api_request_qwen(local_file, question, key, model) 
+
 
 6. basic
     - 获取图片: get_image(url, boto3_client = None) 
@@ -61,7 +52,6 @@ from .basic import (
     gettxt_list,
     print_divider
 )
-from .boto3client import Boto3Client
 from .aossclient import AossClient
 
 def start():

@@ -1,6 +1,5 @@
 
 import os
-import nbformat as nbf
 from PIL import Image
 
 def resize(image, base_short_side=512):
@@ -39,6 +38,7 @@ def displayPerData(jsondata, images_root, resize_size=448):
 
 
 def startView(data_jsonl="", images_root="", opt_root=""):
+    import nbformat as nbf
     '''
     创建ipynb文件来看数据，当前代码只创建代码文件，输入可以为空
     opt_root 为输出文件的目录，默认为当前目录

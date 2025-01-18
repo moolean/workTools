@@ -5,7 +5,6 @@ import string
 import numpy as np
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
-import cv2
 from datetime import datetime
 
 def gettime():
@@ -146,29 +145,6 @@ def draw_rectangles_with_text(img, data, width=1, font_size=12):
         loc_y = max(0, ymin - font_size - 1)
         draw.text((xmin + 1, loc_y), text, fill="red", font=font)
     return img
-
-def get_bbox(char_img: np.ndarray) -> tuple:
-    """
-    Calculates the bounding box coordinates for a character image.
-
-    Args:
-        char_img (np.ndarray): The character image as a NumPy array.
-
-    Returns:
-        tuple: A tuple containing the x, y, width, and height of the bounding box.
-    """
-    if char_img.dtype == np.dtype(bool):
-        char_img = char_img.astype(np.uint8) * 255
-    img = cv2.cvtColor(char_img, cv2.COLOR_BGR2GRAY) if len(char_img.shape) == 3 else char_img
-    _, img = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY)
-    img = 255 - img
-    edges = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
-    if len(edges) > 0:
-        edges = np.concatenate(edges, axis=0)
-        x, y, w, h = cv2.boundingRect(edges)
-        return (x, y, w, h)
-    else:
-        return 0, 0, 0, 0
 
 def split_list_into_parts(lst, n):
     """

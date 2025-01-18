@@ -17,9 +17,13 @@ from .basic import print_divider
 #     else:
 #         return AossClient(*args, **kwargs)
 
+
+
 class AossClient:
     def __init__(self, endpoint_url=None, access_key=None, secret_key=None):
-
+        """
+        会直接读取当前用户根目录下的aoss.conf文件获取key
+        """
         if endpoint_url and access_key and secret_key:
             self.endpoint_url = endpoint_url
             self.access_key = access_key

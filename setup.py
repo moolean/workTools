@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='sensetool',
-      version='1.1',
+      version='2.0',
       description='work tools',
       url='https://github.com/moolean/workTools.git',
       author='yao tiankuo',
@@ -9,12 +9,10 @@ setup(name='sensetool',
       packages=['sensetool'],
       zip_safe=False,
       install_requires=[
-        "opencv-python",
         "pandas",
         "numpy",
         "easydict",
         "nbformat",
-        "dashscope",
         "ipywidgets",
         "openai",
         "boto3"
