@@ -236,7 +236,7 @@ def check_language_sample(sample, invalid_types, format_tag):
                 check_answer(message['value'], invalid_types, format_tag)
 
 
-def check_image_input_sample(sample, invalid_types, format_tag, check_wh=True):
+def check_image_input_sample(sample, invalid_types, format_tag):
     # check conversations
     num_image = check_conversations(sample, invalid_types, format_tag, modal_placeholder="<image>\n")
 
@@ -253,24 +253,22 @@ def check_image_input_sample(sample, invalid_types, format_tag, check_wh=True):
         else:
             invalid_types.add("image field type error")
 
+        # 检查宽高格式，不检查宽高是否正确，不读图
+        if 'width' not in sample or 'height' not in sample:
+            invalid_types.add("wrong height/width")
+        else:
+            if type(sample['image']) is str:
+                if type(sample['width']) is not int or type(sample['height']) is not int or sample['width'] <= 0 or sample['height'] <=0:
+                    invalid_types.add("wrong height/width")
 
-        # check wh field
-        if check_wh:
-            if 'width' not in sample or 'height' not in sample:
-                invalid_types.add("wrong height/width")
-            else:
-                if type(sample['image']) is str:
-                    if type(sample['width']) is not int or type(sample['height']) is not int or sample['width'] <= 0 or sample['height'] <=0:
+            elif type(sample['image']) is list:
+                if type(sample['width']) is not list or type(sample['height']) is not list:
+                    invalid_types.add("wrong height/width")
+                else:
+                    if any(x <= 0 for x in sample['width']):
                         invalid_types.add("wrong height/width")
-
-                elif type(sample['image']) is list:
-                    if type(sample['width']) is not list or type(sample['height']) is not list:
+                    elif any(x <= 0 for x in sample['height']):
                         invalid_types.add("wrong height/width")
-                    else:
-                        if any(x <= 0 for x in sample['width']):
-                            invalid_types.add("wrong height/width")
-                        elif any(x <= 0 for x in sample['height']):
-                            invalid_types.add("wrong height/width")
             
 
 def check_video_input_sample(sample, invalid_types, format_tag):
@@ -293,7 +291,7 @@ def check_pure_text_sample(sample, invalid_types, format_tag):
     check_conversations(sample, invalid_types, format_tag)
 
 
-def check_dataset_format(dataset, format_tag="", check_wh=False):
+def check_dataset_format(dataset, image_root=None, client=None, format_tag="", check_wh=False):
     invalid_type2idx = defaultdict(list)
     for idx, sample in enumerate(dataset):
         try:
@@ -301,12 +299,12 @@ def check_dataset_format(dataset, format_tag="", check_wh=False):
             if "conversation" in sample:
                 check_language_sample(sample, invalid_types, format_tag)
             elif 'image' in sample:
-                check_image_input_sample(sample, invalid_types, format_tag, check_wh=check_wh)
+                check_image_input_sample(sample, invalid_types, format_tag)
             elif 'video' in sample:
                 check_video_input_sample(sample, invalid_types, format_tag)
             else:
                 check_pure_text_sample(sample, invalid_types, format_tag)
-
+            # 记录错误数据出现的位置
             if invalid_types:
                 for invalid_type in invalid_types:
                     invalid_type2idx[invalid_type].append(idx)
@@ -315,6 +313,33 @@ def check_dataset_format(dataset, format_tag="", check_wh=False):
             print(f"{type(e).__name__}: {e}")
             traceback.print_exc()
             invalid_type2idx["unknown error"].append(idx)
+
+    # 检查图片是否能读到
+    mini_dataset = random.choices(dataset, k=10)
+    for data in mini_dataset:
+        if 'image' not in data:
+            continue
+        image_name = data['image']
+        if isinstance(image_name, list):
+            for image_name in image_name:
+                image_file = os.path.join(image_root, image_name)
+                try:
+                    image = get_image(image_file, client)
+                except:
+                    invalid_type2idx["image_get_fail"].append(image_file)
+        else:
+            image_file = os.path.join(image_root, image_name)
+            try:
+                image = get_image(image_file, client)
+            except:
+                invalid_type2idx["image_get_fail"].append(image_file)
+
+    # 只保存前50个错误，加入错误总数到list最后
+    for k, v in invalid_type2idx.items():
+        if len(v) > 50:
+            invalid_type2idx[k] = v[:50] + [len(v)]
+        else:
+            invalid_type2idx[k] = v + [len(v)]
 
     return invalid_type2idx
 
@@ -350,20 +375,15 @@ def worker_fn(meta):
         # print(f'>>> input={json_file}')
         dataset = read_jsonl(json_file, AossClient)
         # print(f'number={len(dataset)}')
-        msg = check_dataset_format(dataset)
-        # msg = None
+        msg = check_dataset_format(dataset, image_root, AossClient) # 检查格式正误
+        
         if msg == defaultdict(list):
-            # return "sesecore cannot access mst images, other format correct"
-            mini_dataset = random.choices(dataset, k=10)
-            if check_image_correct(mini_dataset, image_root, AossClient):
-                msg = 'check image success.'
-                return msg
-            else:
-                msg = 'Error: image check fail'
-                return msg
+            msg = 'check dataset success.'
         else:
-            msg = f'Error: format is incorrect. msg={msg}'
-            return msg
+            msg = '\n'.join([f'{k}: 在位置{v[:-1]}处出错，共出错{v[-1]}次' for k, v in msg.items()])
+            msg = 'Error: format is incorrect. msg=\n' + msg
+
+        return msg
     except:
         print(traceback.format_exc())
         return "Error: unexpected error"
@@ -383,11 +403,17 @@ class checker():
 
     def _checkdata(self, meta_dataset):
         # args = [(meta, lambda x:self._AossClient) for meta in meta_dataset]
-        with concurrent.futures.ProcessPoolExecutor(max_workers=max(50, len(meta_dataset))) as executor:
-            for meta, msg in zip(meta_dataset, executor.map(worker_fn, meta_dataset)):
-                print('\n>>>>>>')
-                print(meta)
-                print(msg)
+        total = len(meta_dataset)
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max(50, total)) as executor:
+            futures = list(executor.map(worker_fn, meta_dataset))
+            for i, (meta, msg) in enumerate(zip(meta_dataset, futures)):
+                print(f'\r进度: [{i+1}/{total}]', end='', flush=True)
+                if not msg == 'check dataset success.':
+                    # 如果检查失败，打印出错误数据
+                    print('\n>>>>>>')
+                    print(meta) 
+                    print(msg)
+            print() # 打印一个换行
 
     # 数据脚本验证
     def checkfiles(self, filepath):

@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='sensetool',
-      version='2.0',
+      version='2.0.5',
       description='work tools',
       url='https://github.com/moolean/workTools.git',
       author='yao tiankuo',
