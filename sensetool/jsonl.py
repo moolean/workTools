@@ -73,7 +73,7 @@ def read_jsonl(file, client=None):
             try:
                 outputs.append(json.loads(line))
             except Exception as e:
-                print(f'i={i}, line={line}')
+                print(f'line_id={i}, err={e}')
                 # raise e
     return outputs
 
@@ -136,9 +136,6 @@ def insert_image_token(text):
     else:
         result = text + '\n<image>'
     return result
-
-
-
 
 def random_get_proxy(file, idx):
     fr = open(file, 'r', encoding='utf-8')
