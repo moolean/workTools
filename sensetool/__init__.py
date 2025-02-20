@@ -13,7 +13,7 @@
     - read_jsonl(file, client=None) 
     - write_jsonl(file, data)
 5. apis: 
-
+    - openai(sys, text, img, openai_client)
 
 6. basic
     - 获取图片: get_image(url, boto3_client = None) 

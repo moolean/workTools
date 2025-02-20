@@ -17,8 +17,6 @@ from .basic import print_divider
 #     else:
 #         return AossClient(*args, **kwargs)
 
-
-
 class AossClient:
     def __init__(self, endpoint_url=None, access_key=None, secret_key=None):
         """
@@ -29,9 +27,8 @@ class AossClient:
             self.access_key = access_key
             self.secret_key = secret_key
         else:
-            # 获取跟目录路径，统一跟目录为 /mnt/afs/yaotiankuo
-            current_directory = os.getcwd().split("/") # ['', 'mnt', 'afs', 'yaotiankuo']
-            user_root = "/".join(current_directory[:4])
+            # 获取用户根目录路径
+            user_root = os.path.expanduser('~')
             # 获取aoss文件，默认aoss.conf在用户跟目录下
             config = configparser.ConfigParser()
             config.read(os.path.join(user_root,'aoss.conf'))
